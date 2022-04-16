@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
     public float speed;
     private float xBound = 11f;
     private float zBound = 6f;
+    public bool isGameOver = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -42,8 +43,31 @@ public class PlayerController : MonoBehaviour
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         float VerticalInput = Input.GetAxis("Vertical");
-        transform.Translate(Vector3.forward * Time.deltaTime * speed * VerticalInput);
-        transform.Translate(Vector3.right * Time.deltaTime * speed * horizontalInput);
+        transform.Translate(Vector3.forward * Time.deltaTime * speed * VerticalInput, Space.World);
+        transform.Translate(Vector3.right * Time.deltaTime * speed * horizontalInput, Space.World);
 
+    }
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            Debug.Log("You hit the" + other.gameObject.name);
+            isGameOver = true;
+        }
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Item_heal"))
+        {
+            Destroy(other.gameObject);
+        }
+        if (other.gameObject.CompareTag("Item_shied"))
+        {
+            Destroy(other.gameObject);
+        }
+        if (other.gameObject.CompareTag("Item_bomb"))
+        {
+            Destroy(other.gameObject);
+        }
     }
 }
