@@ -8,6 +8,7 @@ TagManager:
   - Item_heal
   - Item_shied
   - Item_bomb
+  - Bullet
   layers:
   - Default
   - TransparentFX
