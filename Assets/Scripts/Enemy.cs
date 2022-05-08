@@ -4,25 +4,61 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public float speed = 100;
-    public GameObject player;
+    [SerializeField] float speed = 100;
+    GameObject player;
+    Animator animator;
+    Vector3 player_pos;
+    Collider m_collider;
+    Rigidbody EnemyRb;
+    bool isAlive = true;
     // Start is called before the first frame update
     void Start()
     {
         player = GameObject.Find("Player");
+        animator = GetComponent<Animator>();
+        m_collider = GetComponent<Collider>();
+        EnemyRb = GetComponent<Rigidbody>();
     }
-
     // Update is called once per frame
     void Update()
     {
-        Vector3 LookDirection = (player.gameObject.transform.position - transform.position).normalized;
-        transform.Translate(LookDirection * speed * Time.deltaTime, Space.World);
+        Enemy_Move();
     }
     private void OnCollisionEnter(Collision other)
     {
+        //if (other.gameObject.CompareTag("player"))
+        //{
+        //    animator.SetBool("isAttack", true);
+        //}
+
         if (other.gameObject.CompareTag("Bullet"))
         {
+            isAlive = false;
+            animator.SetTrigger("isDead");
+            Destroy(other.gameObject);
+            EnemyRb.constraints = RigidbodyConstraints.FreezeAll;
+            m_collider.enabled = false;
+            StartCoroutine(Delete_Enemy());
+        }
+
+        IEnumerator Delete_Enemy()
+        {
+            yield return new WaitForSeconds(1.5f);
             Destroy(gameObject);
         }
+    }
+    private void Enemy_Move()
+    {
+        if (isAlive)
+        {
+            //* Enemy angle
+            Vector3 relative = transform.InverseTransformPoint(player.transform.position);
+            float angle = Mathf.Atan2(relative.x, relative.z) * Mathf.Rad2Deg;
+
+            Vector3 LookDirection = (player.gameObject.transform.position - transform.position).normalized;
+            transform.Translate(LookDirection * speed * Time.deltaTime, Space.World);
+            transform.Rotate(0, angle, 0);
+        }
+
     }
 }

@@ -8,9 +8,13 @@ public class PlayerController : MonoBehaviour
     private float xBound = 11f;
     private float zBound = 6f;
     public bool isGameOver = false;
+    private Animator anim;
+    GameObject MousePos;
     // Start is called before the first frame update
     void Start()
     {
+        MousePos = GameObject.Find("Point");
+        anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -18,6 +22,14 @@ public class PlayerController : MonoBehaviour
     {
         MovePlayer();
         PlayerLimitMove();
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.A))
+        {
+            anim.SetBool("isRun", true);
+        }
+        else
+        {
+            anim.SetBool("isRun", false);
+        }
     }
 
     void PlayerLimitMove()
@@ -45,7 +57,10 @@ public class PlayerController : MonoBehaviour
         float VerticalInput = Input.GetAxis("Vertical");
         transform.Translate(Vector3.forward * Time.deltaTime * speed * VerticalInput, Space.World);
         transform.Translate(Vector3.right * Time.deltaTime * speed * horizontalInput, Space.World);
-
+        //* Player angle
+        Vector3 relative = transform.InverseTransformPoint(MousePos.transform.position);
+        float angle = Mathf.Atan2(relative.x, relative.z) * Mathf.Rad2Deg;
+        transform.Rotate(0, angle, 0);
     }
     private void OnCollisionEnter(Collision other)
     {
