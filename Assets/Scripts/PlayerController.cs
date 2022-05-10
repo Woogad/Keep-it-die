@@ -10,11 +10,16 @@ public class PlayerController : MonoBehaviour
     public bool isGameOver = false;
     private Animator anim;
     GameObject MousePos;
+    [SerializeField] AudioClip boom_sound;
+    [SerializeField] AudioClip heal_sound;
+    [SerializeField] AudioClip shied_sound;
+    AudioSource PlayerAudio;
     // Start is called before the first frame update
     void Start()
     {
         MousePos = GameObject.Find("Point");
         anim = GetComponent<Animator>();
+        PlayerAudio = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -74,14 +79,17 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Item_heal"))
         {
+            PlayerAudio.PlayOneShot(heal_sound, 1f);
             Destroy(other.gameObject);
         }
         if (other.gameObject.CompareTag("Item_shied"))
         {
+            PlayerAudio.PlayOneShot(shied_sound, 1f);
             Destroy(other.gameObject);
         }
         if (other.gameObject.CompareTag("Item_bomb"))
         {
+            PlayerAudio.PlayOneShot(heal_sound, 1f);
             Destroy(other.gameObject);
         }
     }
