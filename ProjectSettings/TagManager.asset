@@ -10,6 +10,7 @@ TagManager:
   - Item_bomb
   - Bullet
   - player
+  - Item
   layers:
   - Default
   - TransparentFX

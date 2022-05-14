@@ -7,34 +7,43 @@ public class PlayerController : MonoBehaviour
     public float speed;
     private float xBound = 11f;
     private float zBound = 6f;
-    public bool isGameOver = false;
     private Animator anim;
     GameObject MousePos;
-    [SerializeField] AudioClip boom_sound;
-    [SerializeField] AudioClip heal_sound;
-    [SerializeField] AudioClip shied_sound;
+    GameManager GameManager;
     AudioSource PlayerAudio;
+    Item item;
+    [SerializeField] AudioClip bombSound;
+    [SerializeField] AudioClip healSound;
+    [SerializeField] AudioClip shiedSound;
+    public bool isPlayerAlive;
     // Start is called before the first frame update
     void Start()
     {
+        GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         MousePos = GameObject.Find("Point");
+        item = GetComponent<Item>();
         anim = GetComponent<Animator>();
         PlayerAudio = GetComponent<AudioSource>();
+        isPlayerAlive = true;
     }
 
     // Update is called once per frame
     void Update()
     {
-        MovePlayer();
-        PlayerLimitMove();
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.A))
+        if (GameManager.GameActive)
         {
-            anim.SetBool("isRun", true);
+            MovePlayer();
+            PlayerLimitMove();
+            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.A))
+            {
+                anim.SetBool("isRun", true);
+            }
+            else
+            {
+                anim.SetBool("isRun", false);
+            }
         }
-        else
-        {
-            anim.SetBool("isRun", false);
-        }
+
     }
 
     void PlayerLimitMove()
@@ -72,25 +81,29 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.CompareTag("Enemy"))
         {
             Debug.Log("You hit the" + other.gameObject.name);
-            isGameOver = true;
+            GameManager.GameActive = false;
+            isPlayerAlive = false;
         }
     }
     private void OnTriggerEnter(Collider other)
     {
+        if (other.gameObject.CompareTag("Item_bomb"))
+        {
+            PlayerAudio.PlayOneShot(bombSound);
+            Destroy(other.gameObject);
+            Debug.Log("bomb");
+        }
         if (other.gameObject.CompareTag("Item_heal"))
         {
-            PlayerAudio.PlayOneShot(heal_sound, 1f);
+            PlayerAudio.PlayOneShot(healSound);
             Destroy(other.gameObject);
+            Debug.Log("heal");
         }
         if (other.gameObject.CompareTag("Item_shied"))
         {
-            PlayerAudio.PlayOneShot(shied_sound, 1f);
+            PlayerAudio.PlayOneShot(shiedSound);
             Destroy(other.gameObject);
-        }
-        if (other.gameObject.CompareTag("Item_bomb"))
-        {
-            PlayerAudio.PlayOneShot(heal_sound, 1f);
-            Destroy(other.gameObject);
+            Debug.Log("shied");
         }
     }
 }

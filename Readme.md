@@ -1,6 +1,6 @@
 Hello This is Keep it die game!!
 
-This version is v0.5
+This version is v0.6
 
 Add list v0.4
 - Basic game play 
@@ -9,4 +9,13 @@ Add list v0.4
 
 Add list v0.5
 - Basic sound 
-    - Shot , Item pickup , Background
+    - Shot , Item pickup , Background 
+ 
+Add lis v0.6
+- UI
+    - Start Game
+    - Difficult Selection
+    - Restart Game
+
+- Difficulty
+    - Easy,Medium,Hard
