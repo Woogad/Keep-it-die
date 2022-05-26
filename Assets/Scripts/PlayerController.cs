@@ -7,16 +7,21 @@ public class PlayerController : MonoBehaviour
     public float speed;
     private float xBound = 11f;
     private float zBound = 6f;
+    public bool isPlayerAlive;
+    private int MaxHealth = 100;
+    private int CrrentHealth;
+
     private Animator anim;
-    GameObject MousePos;
-    GameManager GameManager;
-    AudioSource PlayerAudio;
-    Item item;
+    private GameObject MousePos;
+    private GameManager GameManager;
+    private AudioSource PlayerAudio;
+    private Item item;
+
+    [SerializeField] HealthBar healthBar;
     [SerializeField] AudioClip bombSound;
     [SerializeField] AudioClip healSound;
     [SerializeField] AudioClip shiedSound;
-    public bool isPlayerAlive;
-    // Start is called before the first frame update
+
     void Start()
     {
         GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -25,15 +30,17 @@ public class PlayerController : MonoBehaviour
         anim = GetComponent<Animator>();
         PlayerAudio = GetComponent<AudioSource>();
         isPlayerAlive = true;
+        CrrentHealth = MaxHealth;
+        healthBar.setMaxHealthBar(MaxHealth);
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (GameManager.GameActive)
         {
             MovePlayer();
             PlayerLimitMove();
+
             if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.A))
             {
                 anim.SetBool("isRun", true);
@@ -41,6 +48,12 @@ public class PlayerController : MonoBehaviour
             else
             {
                 anim.SetBool("isRun", false);
+            }
+
+            if (CrrentHealth < 1)
+            {
+                GameManager.GameActive = false;
+                isPlayerAlive = false;
             }
         }
 
@@ -65,6 +78,7 @@ public class PlayerController : MonoBehaviour
             transform.position = new Vector3(-xBound, transform.position.y, transform.position.z);
         }
     }
+
     void MovePlayer()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
@@ -76,13 +90,14 @@ public class PlayerController : MonoBehaviour
         float angle = Mathf.Atan2(relative.x, relative.z) * Mathf.Rad2Deg;
         transform.Rotate(0, angle, 0);
     }
+
     private void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.CompareTag("Enemy"))
         {
             Debug.Log("You hit the" + other.gameObject.name);
-            GameManager.GameActive = false;
-            isPlayerAlive = false;
+            TakeDamage(20);
+
         }
     }
     private void OnTriggerEnter(Collider other)
@@ -105,5 +120,11 @@ public class PlayerController : MonoBehaviour
             Destroy(other.gameObject);
             Debug.Log("shied");
         }
+    }
+
+    void TakeDamage(int Damage)
+    {
+        CrrentHealth -= Damage;
+        healthBar.setHealthBar(CrrentHealth);
     }
 }

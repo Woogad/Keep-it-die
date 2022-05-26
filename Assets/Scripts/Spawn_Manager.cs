@@ -6,37 +6,55 @@ public class Spawn_Manager : MonoBehaviour
 {
     public GameObject[] Enemies;
     public GameObject[] Items;
+    private GameObject[] FindItem;
+    private GameManager GameManager;
+    private GameObject[] FindEnemy;
+
     private float zBound = 8f;
-    float zBound_item = 5f;
+    private float zBound_item = 5f;
+    public float difficultSpawnRate;
     private float xBound = 11f;
-    public int WaveCount = 0;
-    private int FindEnemy;
-    GameObject[] FindItem;
-    bool callItem = false;
-    GameManager GameManager;
+    public float diffIncrease = 0f;
+    private int WaveTime;
+    private int Time = 40;
+    private int CdTime = 3;
+    private int Cwave;
+    private bool Wave_isStart;
 
     void Start()
     {
         GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-
-        Debug.Log("hello");
-
+        WaveTime = Time;
+        Wave_isStart = true;
+        Cwave = 0;
     }
 
     void Update()
     {
-        FindEnemy = FindObjectsOfType<Enemy>().Length;
-        if (FindEnemy == 0 && GameManager.GameActive)
+        if (GameManager.GameActive)
         {
-            if (callItem == false)
+            if (WaveTime > 0 && Wave_isStart)
             {
-                callItem = true;
-                InvokeRepeating("Spawn_Item_random", GameManager.difficultSpawnItemRate, GameManager.difficultSpawnItemRate);
+                difficultSpawnRate = GameManager.difficultSpawnRate;
+                difficultSpawnRate -= diffIncrease;
+                WaveStart();
+                Wave_isStart = false;
             }
-            WaveCount += GameManager.difficultSpawnRate;
-            spwan_enemy_wave(WaveCount);
-            Debug.Log(WaveCount);
-            DestroyItem();
+            if (Wave_isStart == false && WaveTime < 1)
+            {
+                WaveEnd();
+                StartCoroutine(NewWave());
+            }
+            GameManager.CountTime(WaveTime);
+        }
+    }
+
+    void DestroyEnemy()
+    {
+        FindEnemy = GameObject.FindGameObjectsWithTag("Enemy");
+        for (int i = 0; i < FindEnemy.Length; i++)
+        {
+            Destroy(FindEnemy[i]);
         }
     }
 
@@ -67,12 +85,40 @@ public class Spawn_Manager : MonoBehaviour
 
     }
 
-    void spwan_enemy_wave(int EnemyWaveCount)
+    void spwan_enemy_wave(float EnemyWaveSpawnRate)
     {
+        InvokeRepeating("Spawn_enemies_random", 1f, EnemyWaveSpawnRate);
+        InvokeRepeating("Spawn_Item_random", GameManager.difficultSpawnItemRate, GameManager.difficultSpawnItemRate);
+    }
 
-        for (int i = 0; i < EnemyWaveCount; i++)
-        {
-            Spawn_enemies_random();
-        }
+    void WaveStart()
+    {
+        Debug.Log("Wave is started");
+        Cwave++;
+        GameManager.CountWave(Cwave);
+        spwan_enemy_wave(difficultSpawnRate);
+        InvokeRepeating("TimeRemain", 1f, 1f);
+    }
+
+    void TimeRemain()
+    {
+        WaveTime--;
+    }
+
+    void WaveEnd()
+    {
+        Debug.Log("Wave End");
+        CancelInvoke();
+        DestroyItem();
+        DestroyEnemy();
+        Wave_isStart = true;
+        diffIncrease += 0.05f;
+    }
+
+    IEnumerator NewWave()
+    {
+        Debug.Log("cd time");
+        yield return new WaitForSeconds(CdTime);
+        WaveTime = Time;
     }
 }

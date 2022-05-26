@@ -5,13 +5,14 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     [SerializeField] float speed = 100;
-    GameObject player;
-    Animator animator;
-    Vector3 player_pos;
-    Collider m_collider;
-    Rigidbody EnemyRb;
-    bool isAlive = true;
-    // Start is called before the first frame update
+    private GameObject player;
+    private Animator animator;
+    private Vector3 player_pos;
+    private Collider m_collider;
+    private Rigidbody EnemyRb;
+
+    private bool isAlive = true;
+
     void Start()
     {
         player = GameObject.Find("Player");
@@ -19,17 +20,14 @@ public class Enemy : MonoBehaviour
         m_collider = GetComponent<Collider>();
         EnemyRb = GetComponent<Rigidbody>();
     }
-    // Update is called once per frame
+
     void Update()
     {
         Enemy_Move();
     }
+
     private void OnCollisionEnter(Collision other)
     {
-        //if (other.gameObject.CompareTag("player"))
-        //{
-        //    animator.SetBool("isAttack", true);
-        //}
 
         if (other.gameObject.CompareTag("Bullet"))
         {
@@ -47,6 +45,7 @@ public class Enemy : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
     private void Enemy_Move()
     {
         if (isAlive)
