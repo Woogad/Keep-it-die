@@ -25,4 +25,4 @@ Add list v0.7
 - Health system
 - New spawn enemy system
 - GUI
-    -Wave title , Ammo , Wave time , Health bar
+    - Wave title , Ammo , Wave time , Health bar
