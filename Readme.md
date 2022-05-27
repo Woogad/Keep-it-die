@@ -26,4 +26,3 @@ Add list v0.7
 - New spawn enemy system
 - GUI
     - Wave title , Ammo , Wave time , Health bar
-Texting new line
